@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 polars = "0.52.*"
 thiserror = "2"
+colback-derive = { path = "../colback-derive/" }
