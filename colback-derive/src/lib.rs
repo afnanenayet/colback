@@ -2,7 +2,6 @@ use darling::FromField;
 use proc_macro::TokenStream;
 use proc_macro_crate::{FoundCrate, crate_name};
 use proc_macro_error::{abort, proc_macro_error};
-use proc_macro2::Span;
 use quote::{format_ident, quote};
 use syn::{Data, DeriveInput, Fields, parse_macro_input};
 
@@ -258,17 +257,14 @@ struct TypeMap {
 
 fn option_inner(ty: &syn::Type) -> (bool, syn::Type) {
     // MVP: detect Option<T> only for the canonical path Option<...>
-    if let syn::Type::Path(tp) = ty {
-        if tp.qself.is_none()
-            && tp.path.segments.len() == 1
-            && tp.path.segments[0].ident == "Option"
-        {
-            if let syn::PathArguments::AngleBracketed(ref args) = tp.path.segments[0].arguments {
-                if let Some(syn::GenericArgument::Type(inner)) = args.args.first() {
-                    return (true, inner.clone());
-                }
-            }
-        }
+    if let syn::Type::Path(tp) = ty
+        && tp.qself.is_none()
+        && tp.path.segments.len() == 1
+        && tp.path.segments[0].ident == "Option"
+        && let syn::PathArguments::AngleBracketed(ref args) = tp.path.segments[0].arguments
+        && let Some(syn::GenericArgument::Type(inner)) = args.args.first()
+    {
+        return (true, inner.clone());
     }
     (false, ty.clone())
 }
