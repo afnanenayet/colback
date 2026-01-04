@@ -39,8 +39,8 @@ struct ColbackFieldOpts {
     ///
     /// - "error": Will raise an error when trying to extract the dataframe if any values are null
     /// - "option": The derived view struct will have use an optional type so that some values can
-    ///    be null. This is the only allowed value if the original struct has a field set to
-    ///    optional.
+    ///   be null. This is the only allowed value if the original struct has a field set to
+    ///   optional.
     /// - "default": Null row values will be replaced by some default value.
     #[darling(default)]
     null: Option<String>,

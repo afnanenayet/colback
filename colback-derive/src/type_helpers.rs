@@ -65,7 +65,7 @@ pub fn map_type(col_ident: &syn::Ident, ty: &syn::Type) -> Option<TypeMap> {
 
     let get_value_expr = quote!(self.#col_ident.get(idx));
     // TODO: determine best way to handle categoricals
-    let out = map_prim!(
+    map_prim!(
         ident.as_str(),
         get_value_expr,
         "u8" => { dtype: UInt8, accessor: "u8", chunked: UInt8Chunked, row_ty: u8 },
@@ -78,6 +78,5 @@ pub fn map_type(col_ident: &syn::Ident, ty: &syn::Type) -> Option<TypeMap> {
         "f64" => { dtype: Float64, accessor: "f64", chunked: Float64Chunked, row_ty: f64 },
         "bool" => { dtype: Boolean, accessor: "bool", chunked: BooleanChunked, row_ty: bool },
         "String" => { dtype: String, accessor: "str", chunked: StringChunked, row_ty: &'a str },
-    );
-    out
+    )
 }
