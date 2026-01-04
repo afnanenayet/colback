@@ -142,12 +142,12 @@ mod tests {
         {
             let row_ref = x.get(0).unwrap();
             assert_eq!(row_ref.row_a, 0);
-            assert_eq!(row_ref.row_b, true);
+            assert!(row_ref.row_b);
         }
         {
             let row_ref = x.get(1).unwrap();
             assert_eq!(row_ref.row_a, 1);
-            assert_eq!(row_ref.row_b, false);
+            assert!(!row_ref.row_b);
         }
     }
 }
