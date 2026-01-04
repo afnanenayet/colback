@@ -2,9 +2,10 @@
 name = "colback"
 version = "0.1.0"
 edition = "2024"
-license = "MIT"
 description = "Column backed structs"
 keywords = ["dataframe", "derive"]
+license.workspace = true
+homepage.workspace = true
 
 [dependencies]
 polars = "0.52.*"
