@@ -35,6 +35,8 @@
 //! assert_eq!(row_ref.col_b, true);
 //! ```
 
+// Trick to allow for codegen within the same crate. This was also required to get the doctest
+// working.
 extern crate self as colback_core;
 
 pub use colback_derive::ColbackView;
@@ -44,9 +46,11 @@ use thiserror::Error;
 /// Errors that can arise when trying to extract a dataframe to a row view.
 #[derive(Debug, Error)]
 pub enum ColbackError {
+    /// Error for when the derive macro is called on a struct without named fields.
     #[error("expected a struct with named fields")]
     UnnamedFields,
 
+    /// When the dataframe is missing a required column that was specified in the struct.
     #[error("missing required column(s): {0:?}")]
     MissingColumn(String),
 
@@ -57,16 +61,19 @@ pub enum ColbackError {
         actual: DataType,
     },
 
+    /// Thrown if the dataframe has a null value and the null handling policy is to error out.
     #[error("null values encountered in non-nullable column {col} at row {idx}")]
     InvalidNull {
+        /// Name of the column with the null value
         col: String,
         // Usually indices are u32 but a feature can enable u64 columns, we're willing to take the
         // hit for an error since we don't need to optimize the sad path.
+        /// Index where the null was encountered
         idx: usize,
     },
 }
 
-/// Convenience alias
+/// Convenience alias for results from this crate.
 pub type Result<T> = std::result::Result<T, ColbackError>;
 
 /// Trait for a struct that contains a reference to a row of a dataframe.
@@ -74,14 +81,27 @@ pub type Result<T> = std::result::Result<T, ColbackError>;
 /// This is typically implemented by the crate's derive macros. This is implemented on a fully
 /// realized struct and defines the associated generated row reference struct types.
 pub trait ColbackView: Sized {
+    /// Stores the underlying data required for row reference structs.
+    ///
+    /// This has a reference to the dataframe and the extracted column chunks and is used to
+    /// generate the row reference proxies.
     type View<'a>
     where
         Self: 'a;
 
+    /// The proxy class that represents a row.
     type RowRef<'a>
     where
         Self: 'a;
 
+    /// Create a view struct for a given dataframe.
+    ///
+    /// The view struct can be used to generate row reference proxy structs.
+    ///
+    /// # Errors
+    ///
+    /// This may throw an error if the dataframe is missing data, has nulls (depending on the null
+    /// handling policy), or if there are dtype mismatches. See [ColbackError] for more details.
     fn view(df: &DataFrame) -> Result<Self::View<'_>>;
 }
 
