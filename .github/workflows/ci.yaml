@@ -36,4 +36,4 @@ jobs:
         if: success() || failure() # always run even if the previous step fails
         with:
           report_paths: "**/target/nextest/ci/junit.xml"
-          check_name: diffsitter tests ${{ matrix.job.target }}
+          check_name: unit tests
