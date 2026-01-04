@@ -1,12 +1,12 @@
 [package]
-name = "colback-core"
+name = "colback"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 polars = "0.52.*"
 thiserror = "2"
-colback-derive = { path = "../colback-derive/" }
+colback-derive = { version = "=0.1.0", path = "../colback-derive/" }
 
 [dev-dependencies]
 trybuild = { version = "1.0", features = ["diff"] }

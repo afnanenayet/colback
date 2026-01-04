@@ -288,7 +288,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "colback-core"
+name = "colback"
 version = "0.1.0"
 dependencies = [
  "colback-derive",

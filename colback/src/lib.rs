@@ -20,7 +20,7 @@
 //! # Example
 //!
 //! ```rust
-//! use colback_core::ColbackView;
+//! use colback::ColbackView;
 //! use polars::df;
 //!
 //! #[derive(ColbackView)]
@@ -37,7 +37,7 @@
 
 // Trick to allow for codegen within the same crate. This was also required to get the doctest
 // working.
-extern crate self as colback_core;
+extern crate self as colback;
 
 pub use colback_derive::ColbackView;
 use polars::{frame::DataFrame, prelude::DataType};

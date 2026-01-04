@@ -1,4 +1,4 @@
-use colback_core::ColbackView;
+use colback::ColbackView;
 
 #[derive(ColbackView, Eq, PartialEq)]
 struct SomeStruct {
