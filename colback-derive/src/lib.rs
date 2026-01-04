@@ -114,12 +114,11 @@ pub fn derive_colback_view(input: TokenStream) -> TokenStream {
         // - Series accessor (u32(), i64(), f64(), bool(), str())
         // - ChunkedArray type in View
         // - row getter expression
-        let map = match map_type(&ident, &inner_ty) {
-            Some(m) => m,
-            None => abort!(
+        let Some(map) = map_type(&ident, &inner_ty) else {
+            abort!(
                 ident,
                 "unsupported field type for ColbackView; add a mapping for this type"
-            ),
+            );
         };
 
         let view_field_ty = map.chunked_ty;
@@ -140,7 +139,7 @@ pub fn derive_colback_view(input: TokenStream) -> TokenStream {
                 "null='default' requires #[polars(default = ...)] to be set"
             ),
             _ => (),
-        };
+        }
 
         // View member
         view_members.push(quote! {
