@@ -25,8 +25,12 @@ jobs:
       - uses: taiki-e/install-action@v2
         with:
           tool: nextest
-      - name: check
-        run: cargo check
+      - name: check formatting
+        run: cargo fmt --all-targets --check
+      - name: typecheck
+        run: cargo check --all-targets
+      - name: clippy lint
+        run: cargo clippy --all-targets
       - name: doctests
         run: cargo test --doc
       - name: tests
