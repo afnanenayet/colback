@@ -1,0 +1,5 @@
+error: null='default' requires #[polars(default = ...)] to be set
+ --> tests/ui/fail_bad_null.rs:7:5
+  |
+7 |     row_b: bool,
+  |     ^^^^^

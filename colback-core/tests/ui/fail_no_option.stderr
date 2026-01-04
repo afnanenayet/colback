@@ -1,0 +1,5 @@
+error: Option<T> fields must use null='option'
+ --> tests/ui/fail_no_option.rs:6:5
+  |
+6 |     row_c: Option<u16>,
+  |     ^^^^^

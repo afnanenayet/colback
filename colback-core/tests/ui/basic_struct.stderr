@@ -1,0 +1,13 @@
+warning: unused import: `polars::df`
+ --> tests/ui/basic_struct.rs:2:5
+  |
+2 | use polars::df;
+  |     ^^^^^^^^^^
+  |
+  = note: `#[warn(unused_imports)]` (part of `#[warn(unused)]`) on by default
+
+error[E0601]: `main` function not found in crate `$CRATE`
+ --> tests/ui/basic_struct.rs:8:2
+  |
+8 | }
+  |  ^ consider adding a `main` function to `$DIR/tests/ui/basic_struct.rs`

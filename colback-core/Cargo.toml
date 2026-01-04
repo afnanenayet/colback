@@ -7,3 +7,6 @@ edition = "2024"
 polars = "0.52.*"
 thiserror = "2"
 colback-derive = { path = "../colback-derive/" }
+
+[dev-dependencies]
+trybuild = { version = "1.0", features = ["diff"] }
