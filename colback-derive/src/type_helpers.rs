@@ -63,7 +63,7 @@ pub fn map_type(col_ident: &syn::Ident, ty: &syn::Type) -> Option<TypeMap> {
         _ => return None,
     };
 
-    let get_value_expr = quote!(self.#col_ident.get(idx));
+    let get_value_expr = quote!(unsafe { self.#col_ident.get_unchecked(idx)} );
     // TODO: determine best way to handle categoricals
     map_prim!(
         ident.as_str(),

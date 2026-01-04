@@ -71,6 +71,10 @@ pub enum ColbackError {
         /// Index where the null was encountered
         idx: usize,
     },
+
+    /// Caller requested an index that's out of bounds
+    #[error("invalid index ({idx}) with len{len}")]
+    InvalidIdx { idx: usize, len: usize },
 }
 
 /// Convenience alias for results from this crate.

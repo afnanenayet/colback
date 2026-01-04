@@ -210,12 +210,20 @@ pub fn derive_colback_view(input: TokenStream) -> TokenStream {
             }
 
             pub fn get(&'a self, idx: usize) -> #rt::Result<#rowref_name<'a>> {
+                let len = self.len();
+                if idx >= len {
+                    return Err(#rt::ColbackError::InvalidIdx{idx, len});
+                }
+                self.get_unchecked(idx)
+            }
+
+            pub fn get_unchecked(&'a self, idx: usize) -> #rt::Result<#rowref_name<'a>> {
                 #(#row_build)*
                 Ok(#rowref_name { _data: Default::default(), #(#row_ctor_idents),* })
             }
 
             pub fn iter(&'a self) -> impl Iterator<Item = #rt::Result<#rowref_name<'a>>> + 'a {
-                (0..self.len()).map(|i| self.get(i))
+                (0..self.len()).map(|i| self.get_unchecked(i))
             }
         }
 
