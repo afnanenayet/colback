@@ -1,5 +1,10 @@
 # colback
 
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/afnanenayet/colback/ci.yaml?style=flat-square)
+![docs.rs](https://img.shields.io/docsrs/colback?style=flat-square)
+![Crates.io Version](https://img.shields.io/crates/v/colback?style=flat-square)
+![Crates.io License](https://img.shields.io/crates/l/colback?style=flat-square)
+
 Column backed lists of structs.
 
 ## Synopsis
