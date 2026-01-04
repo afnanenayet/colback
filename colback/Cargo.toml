@@ -1,6 +1,6 @@
 [package]
 name = "colback"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "Column backed structs"
 keywords = ["dataframe", "derive"]
@@ -10,7 +10,7 @@ homepage.workspace = true
 [dependencies]
 polars = "0.52.*"
 thiserror = "2"
-colback-derive = { version = "=0.1.0", path = "../colback-derive/" }
+colback-derive = { version = "=0.1.1", path = "../colback-derive/" }
 
 [dev-dependencies]
 trybuild = { version = "1.0", features = ["diff"] }

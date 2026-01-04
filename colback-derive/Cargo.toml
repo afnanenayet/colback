@@ -1,6 +1,6 @@
 [package]
 name = "colback-derive"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "proc macros for the colback crate"
 license.workspace = true
