@@ -16,11 +16,6 @@ jobs:
           # Components to add (comma-separated), default is empty.
           component: rustfmt,clippy
       - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: |
-            colback-core
-            colback-derive
-
       - uses: actions/checkout@v5
       - uses: taiki-e/install-action@v2
         with:
