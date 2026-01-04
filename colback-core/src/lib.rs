@@ -43,7 +43,7 @@ pub trait ColbackView: Sized {
     where
         Self: 'a;
 
-    fn view<'a>(df: &'a DataFrame) -> Result<Self::View<'a>>;
+    fn view(df: &DataFrame) -> Result<Self::View<'_>>;
 }
 
 #[cfg(test)]
