@@ -21,7 +21,7 @@ jobs:
             colback-core
             colback-derive
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: taiki-e/install-action@v2
         with:
           tool: nextest
