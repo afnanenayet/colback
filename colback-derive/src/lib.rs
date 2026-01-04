@@ -1,3 +1,6 @@
+mod type_helpers;
+
+use crate::type_helpers::{map_type, option_inner};
 use darling::FromField;
 use proc_macro::TokenStream;
 use proc_macro_crate::{FoundCrate, crate_name};
@@ -125,27 +128,19 @@ pub fn derive_colback_view(input: TokenStream) -> TokenStream {
         let row_value_ty = map.row_value_ty;
         let get_value = map.get_value_expr;
 
-        // Null policy resolution
         let policy = null_policy.as_deref().unwrap_or("error");
-        if policy == "option" && !is_option {
-            abort!(
+        match (policy, is_option, &default_expr) {
+            ("option", false, _) => abort!(
                 ident,
                 "null=\"option\" requires the field type to be Option<T>"
-            );
-        }
-        if is_option && policy == "error" {
-            // allow Option<T> with error policy? Usually surprising; forbid to keep MVP clean.
-            abort!(
+            ),
+            ("error", true, _) => abort!(ident, "Option<T> fields must use null='option'"),
+            ("default", _, None) => abort!(
                 ident,
-                "Option<T> fields must use null=\"option\" (or choose a different policy)"
-            );
-        }
-        if policy == "default" && default_expr.is_none() {
-            abort!(
-                ident,
-                "null=\"default\" requires #[polars(default = <expr>)]"
-            );
-        }
+                "null='default' requires #[polars(default = ...)] to be set"
+            ),
+            _ => (),
+        };
 
         // View member
         view_members.push(quote! {
@@ -155,11 +150,10 @@ pub fn derive_colback_view(input: TokenStream) -> TokenStream {
         let col_var_name = format_ident!("{}_col", col_name);
 
         // Extraction + dtype check
-        // We do a strict dtype check first. For an ergonomic variant you can allow casts here.
+        // TODO: allow type casting here, with warnings
         extract_stmts.push(quote! {
             let #col_var_name = df.column(#col_name)
                 .map_err(|_| #rt::ColbackError::MissingColumn(#col_name.to_string()))?;
-
             if #col_var_name.dtype() != &#expected_dtype {
                 return Err(#rt::ColbackError::WrongDtype {
                     col: #col_name.to_string(),
@@ -167,7 +161,6 @@ pub fn derive_colback_view(input: TokenStream) -> TokenStream {
                     actual: #col_var_name.dtype().clone(),
                 });
             }
-
             let #ident = #col_var_name.#accessor().expect("dtype checked above");
         });
 
@@ -243,79 +236,4 @@ pub fn derive_colback_view(input: TokenStream) -> TokenStream {
 
     };
     expanded.into()
-}
-
-// ---------- type mapping helpers (proc-macro side) ----------
-
-struct TypeMap {
-    expected_dtype: proc_macro2::TokenStream,
-    accessor: syn::Ident,
-    chunked_ty: proc_macro2::TokenStream,
-    row_value_ty: proc_macro2::TokenStream,
-    get_value_expr: proc_macro2::TokenStream,
-}
-
-fn option_inner(ty: &syn::Type) -> (bool, syn::Type) {
-    // MVP: detect Option<T> only for the canonical path Option<...>
-    if let syn::Type::Path(tp) = ty
-        && tp.qself.is_none()
-        && tp.path.segments.len() == 1
-        && tp.path.segments[0].ident == "Option"
-        && let syn::PathArguments::AngleBracketed(ref args) = tp.path.segments[0].arguments
-        && let Some(syn::GenericArgument::Type(inner)) = args.args.first()
-    {
-        return (true, inner.clone());
-    }
-    (false, ty.clone())
-}
-
-/// Maps struct types to polars dtypes
-fn map_type(col_ident: &syn::Ident, ty: &syn::Type) -> Option<TypeMap> {
-    let ident = match ty {
-        syn::Type::Path(tp) if tp.qself.is_none() && tp.path.segments.len() == 1 => {
-            tp.path.segments[0].ident.to_string()
-        }
-        _ => return None,
-    };
-
-    let get_value_expr = quote!(self.#col_ident.get(idx));
-
-    match ident.as_str() {
-        "u32" => Some(TypeMap {
-            expected_dtype: quote!(::polars::prelude::DataType::UInt32),
-            accessor: syn::Ident::new("u32", proc_macro2::Span::call_site()),
-            chunked_ty: quote!(::polars::prelude::UInt32Chunked),
-            row_value_ty: quote!(u32),
-            get_value_expr,
-        }),
-        "i64" => Some(TypeMap {
-            expected_dtype: quote!(::polars::prelude::DataType::Int64),
-            accessor: syn::Ident::new("i64", proc_macro2::Span::call_site()),
-            chunked_ty: quote!(::polars::prelude::Int64Chunked),
-            row_value_ty: quote!(i64),
-            get_value_expr,
-        }),
-        "f64" => Some(TypeMap {
-            expected_dtype: quote!(::polars::prelude::DataType::Float64),
-            accessor: syn::Ident::new("f64", proc_macro2::Span::call_site()),
-            chunked_ty: quote!(::polars::prelude::Float64Chunked),
-            row_value_ty: quote!(f64),
-            get_value_expr,
-        }),
-        "bool" => Some(TypeMap {
-            expected_dtype: quote!(::polars::prelude::DataType::Boolean),
-            accessor: syn::Ident::new("bool", proc_macro2::Span::call_site()),
-            chunked_ty: quote!(::polars::prelude::BooleanChunked),
-            row_value_ty: quote!(bool),
-            get_value_expr,
-        }),
-        "String" => Some(TypeMap {
-            expected_dtype: quote!(::polars::prelude::DataType::String),
-            accessor: syn::Ident::new("str", proc_macro2::Span::call_site()),
-            chunked_ty: quote!(::polars::prelude::StringChunked),
-            row_value_ty: quote!(&'a str),
-            get_value_expr,
-        }),
-        _ => None,
-    }
 }
