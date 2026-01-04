@@ -28,7 +28,7 @@
 //!     col_a: u32,
 //!     col_b: bool,
 //! }
-//! let df = df! [ "col_a" => [0u32, 1u32], "col_b" => [true, false]].unwrap();
+//! let df = df!["col_a" => [0u32, 1u32], "col_b" => [true, false]].unwrap();
 //! let row_view = MyRow::view(&df).unwrap();
 //! let row_ref = row_view.get(0).unwrap();
 //! assert_eq!(row_ref.col_a, 0);
