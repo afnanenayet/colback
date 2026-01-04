@@ -154,4 +154,30 @@ mod tests {
             assert!(!row_ref.row_b);
         }
     }
+
+    #[test]
+    fn test_iter_df() {
+        #[derive(ColbackView, Eq, PartialEq)]
+        struct SomeStruct {
+            row_a: u32,
+            row_b: bool,
+        }
+        let len = 1000;
+        let row_a_col: Vec<u32> = (0..len).collect();
+        let row_b_col: Vec<bool> = row_a_col.iter().map(|i| i % 2 == 0).collect();
+
+        let df = df! [
+            "row_a" => row_a_col,
+            "row_b" => row_b_col,
+        ]
+        .unwrap();
+        let view = SomeStruct::view(&df).unwrap();
+        let mut res: Vec<SomeStructRowRef> = Vec::with_capacity(len as usize);
+
+        for row_proxy in view.iter() {
+            let row_proxy = unsafe { row_proxy.unwrap_unchecked() };
+            res.push(row_proxy);
+        }
+        assert_eq!(res.len(), len as usize);
+    }
 }
