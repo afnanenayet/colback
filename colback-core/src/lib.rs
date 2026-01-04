@@ -1,3 +1,42 @@
+//! # colback
+//!
+//! Column backed lists of structs.
+//!
+//! # Synopsis
+//!
+//! This crate provides procedural macros that generate code to extract data from dataframes so
+//! that their column data can be used as a view into a proxy struct. You want to keep contiguous
+//! columnar data, but you want to be able to write normal code with type-safety and minimal
+//! boilerplate that is also performant.
+//!
+//! # What it does
+//!
+//! This will first create some proxy view and reference structs based on a struct that you use a
+//! derive macro on. The derive macro then generates some code that will handle extracting the
+//! chunked arrays backing the dataframe columns, as well as proxy/view types for each row. These
+//! proxy types are populated using data from the dataframe, so each instance of a proxy struct
+//! corresponds directly to a row.
+//!
+//! # Example
+//!
+//! ```rust
+//! use colback_core::ColbackView;
+//! use polars::df;
+//!
+//! #[derive(ColbackView)]
+//! struct MyRow {
+//!     col_a: u32,
+//!     col_b: bool,
+//! }
+//! let df = df! [ "col_a" => [0u32, 1u32], "col_b" => [true, false]].unwrap();
+//! let row_view = MyRow::view(&df).unwrap();
+//! let row_ref = row_view.get(0).unwrap();
+//! assert_eq!(row_ref.col_a, 0);
+//! assert_eq!(row_ref.col_b, true);
+//! ```
+
+extern crate self as colback_core;
+
 pub use colback_derive::ColbackView;
 use polars::{frame::DataFrame, prelude::DataType};
 use thiserror::Error;

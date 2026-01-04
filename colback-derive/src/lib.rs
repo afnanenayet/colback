@@ -13,12 +13,12 @@ use syn::{Data, DeriveInput, Fields, parse_macro_input};
 /// This is robust to crates being renamed when users declare the dependency in cargo.
 fn runtime_path() -> proc_macro2::TokenStream {
     match crate_name("colback-core") {
-        Ok(FoundCrate::Itself) => quote!(crate), // only if derive is inside same crate (rare)
         Ok(FoundCrate::Name(name)) => {
             let ident = syn::Ident::new(&name, proc_macro2::Span::call_site());
             quote!(::#ident)
         }
-        Err(_) => quote!(::colback), // fallback; emits a good error later if missing
+        // Default to using the standard name
+        Ok(FoundCrate::Itself) | Err(_) => quote!(::colback_core),
     }
 }
 
